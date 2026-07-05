@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "instapost-mine",
-    "slug": "instapost-mine",
+    "name": "SoloGram",
+    "slug": "sologram",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true
@@ -24,6 +24,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow access to your photos so you can pick an image to post to your own Instagram."
+        }
+      ]
+    ]
   }
 }
