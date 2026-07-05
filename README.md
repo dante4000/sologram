@@ -7,7 +7,12 @@ endpoint that returns other people's posts. You can:
 - Browse your own posts in a grid
 - Open a post to see its comments (and their replies)
 - Reply to comments, add comments, hide/unhide, and delete comments
-- Publish a new photo post (from your camera roll or a public image URL)
+- **Publish outward: photos, carousels (up to 10), reels, and stories** — from
+  your camera roll or a public URL
+
+It's a **broadcast-only** client: you can post anything to the world, but the app
+never shows you anyone else's posts, reels, or stories. That's inherent to the
+Instagram API — no endpoint exposes other people's content to a third-party app.
 
 > Note on "liking": the Instagram API has **no endpoint to like** a post or a
 > comment, so liking isn't possible from any third-party app. "Interacting"
@@ -79,12 +84,17 @@ src/
 
 ## Notes & limitations
 
-- **Photos must be JPEG served from a public URL.** Instagram's API can't accept
-  a raw upload, so camera-roll photos are auto-uploaded to a free public host
-  (catbox.moe) and that URL is handed to Instagram. For full control, paste your
-  own hosted JPEG URL (e.g. S3/Cloudinary) on the Create screen.
-- **Video/Reels posting** isn't included in this build (it needs a longer
-  upload+polling flow); photos and carousel viewing work.
+- **All media must come from a public URL.** Instagram's API (Instagram Login)
+  has no raw-byte upload, so camera-roll photos **and videos** are auto-uploaded
+  to a free public host (catbox.moe, ~200 MB cap) and that URL is handed to
+  Instagram. For full control, paste your own hosted URL (e.g. S3/Cloudinary).
+- **Reels/video stories are processed server-side**, so publishing polls
+  Instagram until the video is ready (usually 30s–2min) before it goes live.
+- **Stories are "flat."** Instagram's API exposes no parameter for interactive
+  stickers (polls, music, links, questions, countdowns) for anyone — only
+  @mentions. Bake anything interactive into the image/video before posting.
+- **Specs:** photos JPEG ≤8 MB; reels 9:16 MP4, 3–90s; carousels 2–10 mixed
+  items cropped to the first item's aspect ratio.
 - **Rate limits** are generous for one user (~200 calls/hour) and 100 published
   posts / 24h — fine for personal use.
 - The token lives only in your device's secure keychain; there is no backend.
