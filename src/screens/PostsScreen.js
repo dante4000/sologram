@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../auth';
 import * as api from '../api';
 import { theme } from '../theme';
@@ -31,6 +31,7 @@ function thumb(m) {
 export default function PostsScreen() {
   const { token, username } = useAuth();
   const nav = useNavigation();
+  const route = useRoute();
   const [media, setMedia] = useState([]);
   const [after, setAfter] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -57,14 +58,31 @@ export default function PostsScreen() {
     [token, after]
   );
 
+  // Reset when the connected account changes (disconnect / switch token) so we
+  // never show a previous account's posts.
+  useEffect(() => {
+    setMedia([]);
+    setAfter(null);
+    setError(null);
+  }, [token]);
+
   useFocusEffect(
     useCallback(() => {
       if (token && media.length === 0) load(true);
     }, [token]) // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  // Reload when returning here right after publishing a new post.
+  useEffect(() => {
+    if (token && route.params?.refreshAt) load(true);
+  }, [route.params?.refreshAt]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!token) {
-    return <Empty text="Not connected.\n\nGo to the Settings tab and paste your Instagram access token to see your posts." />;
+    return (
+      <Empty
+        text={'Not connected.\n\nGo to the Settings tab and paste your Instagram access token to see your posts.'}
+      />
+    );
   }
 
   return (

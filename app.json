@@ -32,7 +32,8 @@
         {
           "photosPermission": "Allow access to your photos so you can pick an image to post to your own Instagram."
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }

@@ -13,12 +13,14 @@ import {
   Platform,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../auth';
 import * as api from '../api';
 import { theme } from '../theme';
 
 export default function CreateScreen() {
   const { token, userId } = useAuth();
+  const nav = useNavigation();
   const [caption, setCaption] = useState('');
   const [localUri, setLocalUri] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
@@ -65,7 +67,10 @@ export default function CreateScreen() {
       setCaption('');
       setLocalUri(null);
       setImageUrl('');
-      Alert.alert('Posted! 🎉', 'Your photo is now live on your Instagram.');
+      Alert.alert('Posted! 🎉', 'Your photo is now live on your Instagram.', [
+        { text: 'View my posts', onPress: () => nav.navigate('Posts', { refreshAt: Date.now() }) },
+        { text: 'OK', style: 'cancel' },
+      ]);
     } catch (e) {
       setBusy(false);
       setStatus(null);

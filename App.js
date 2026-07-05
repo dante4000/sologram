@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -6,7 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { AuthProvider } from './src/auth';
+import { AuthProvider, useAuth } from './src/auth';
 import { theme } from './src/theme';
 import PostsScreen from './src/screens/PostsScreen';
 import PostDetailScreen from './src/screens/PostDetailScreen';
@@ -55,24 +56,40 @@ function Tabs() {
   );
 }
 
+// Gate on auth loading so a user with a stored token doesn't briefly flash the
+// "Not connected" screens on cold start while creds load from secure storage.
+function Root() {
+  const { loading } = useAuth();
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color={theme.text} size="large" />
+      </View>
+    );
+  }
+  return (
+    <NavigationContainer theme={navTheme}>
+      <Stack.Navigator>
+        <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="PostDetail"
+          component={PostDetailScreen}
+          options={{
+            title: 'Post',
+            headerStyle: { backgroundColor: theme.bg },
+            headerTintColor: theme.text,
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <NavigationContainer theme={navTheme}>
-          <Stack.Navigator>
-            <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-            <Stack.Screen
-              name="PostDetail"
-              component={PostDetailScreen}
-              options={{
-                title: 'Post',
-                headerStyle: { backgroundColor: theme.bg },
-                headerTintColor: theme.text,
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <Root />
         <StatusBar style="light" />
       </AuthProvider>
     </SafeAreaProvider>
